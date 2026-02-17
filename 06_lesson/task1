@@ -9,7 +9,7 @@ driver.get("http://uitestingplayground.com/ajax")
 
 driver.find_element(By.ID, "ajaxButton").click()
 
-wait = WebDriverWait(driver, 50)
+wait = WebDriverWait(driver, 15)
 element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "bg-success"))
 )
 

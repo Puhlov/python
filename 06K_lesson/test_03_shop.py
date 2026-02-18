@@ -29,7 +29,6 @@ cart_link.click()
     # Нажатие Checkout
 checkout_button = driver.find_element(By.ID, "checkout")
 checkout_button.click()
-
     # Заполнение формы
 first_name_field = driver.find_element(By.ID, "first-name")
 last_name_field = driver.find_element(By.ID, "last-name")

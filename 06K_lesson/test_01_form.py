@@ -14,7 +14,6 @@ def driver():
     yield driver
     driver.quit()
 
-
     @pytest.mark.usefixtures("driver")
     def test_form():
         driver.get("https://bonigarcia.dev/selenium-webdriver-java/data-types.html")

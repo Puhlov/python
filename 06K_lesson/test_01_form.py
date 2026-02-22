@@ -14,23 +14,21 @@ def driver():
     yield driver
     driver.quit()
 
-    @pytest.mark.usefixtures("driver")
-    def test_form():
-        driver.get("https://bonigarcia.dev/selenium-webdriver-java/data-types.html")
-
+def test_form(driver):
+    driver.get("https://bonigarcia.dev/selenium-webdriver-java/data-types.html")
     wait = WebDriverWait(driver, 30)
-    wait.until(EC.presence_of_element_located((By.ID, 'First name')))
+    wait.until(EC.presence_of_element_located((By.ID, 'first-name')))
  
-    driver.find_element(By.ID, "First name").send_keys("Иван") 
-    driver.find_element(By.ID, "Last name").send_keys("Петров")
-    driver.find_element(By.ID, "Address").send_keys("Ленина, 55-3")
-    driver.find_element(By.ID, "E-mail").send_keys("test@skypro.com")
-    driver.find_element(By.ID, "Phone number").send_keys("+7985899998787")
-    driver.find_element(By.ID, "Zip code").send_keys("")
-    driver.find_element(By.ID, "City").send_keys("Москва")
-    driver.find_element(By.ID, "Country").send_keys("Россия")
-    driver.find_element(By.ID, "Job position").send_keys("QA")
-    driver.find_element(By.ID, "Company").send_keys("SkyPro")
+    driver.find_element(By.ID, "first-name").send_keys("Иван") 
+    driver.find_element(By.ID, "last-name").send_keys("Петров")
+    driver.find_element(By.ID, "address").send_keys("Ленина, 55-3")
+    driver.find_element(By.ID, "e-mail").send_keys("test@skypro.com")
+    driver.find_element(By.ID, "phone").send_keys("+7985899998787")
+    driver.find_element(By.ID, "zip-code").send_keys("")
+    driver.find_element(By.ID, "city").send_keys("Москва")
+    driver.find_element(By.ID, "country").send_keys("Россия")
+    driver.find_element(By.ID, "job position").send_keys("QA")
+    driver.find_element(By.ID, "company").send_keys("SkyPro")
 
     # Нажимаем кнопку Submit  
     driver.find_element(By.ID, "submit").click()
@@ -40,7 +38,7 @@ def driver():
 
     # Проверяем, что Zip code подсвечен красным  
     zip_code_field = driver.find_element(By.ID, "zip-code")
-    assert "border-color: red" in zip_code_field.get_attribute("style"), "Zip code field is not highlighted in red."
+    assert "border-color: #dc3545" in zip_code_field.get_attribute("style"), "Zip code field is not highlighted in red."
 
     # Проверяем, что остальные поля подсвечены зеленым  
     fields = [
@@ -57,7 +55,7 @@ def driver():
 
     for field_name in fields:
         field = driver.find_element(By.ID, field_name)
-        assert "border-color: green" in field.get_attribute("style"), f"{field_name} field is not highlighted in green."
+        assert "border-color: #198754" in field.get_attribute("style"), f"{field_name} field is not highlighted in green."
 
      # Закрываем драйвер  
     driver.quit()

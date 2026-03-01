@@ -1,39 +1,31 @@
-import unittest  
+import pytest  
 from selenium import webdriver  
-from calculator_page import CalculatorPage  
-from selenium.webdriver.support.ui import WebDriverWait  
-from selenium.webdriver.support import expected_conditions as EC
+from calculator_page import CalculatorPage  # Импортируйте ваш класс
 
-class TestCalculator(unittest.TestCase):
-    def setUp(self):
-        self.driver = webdriver.Chrome()
-        self.driver.get("https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html")
-        self.driver.maximize_window()
+@pytest.fixture  
+def driver():
+    # Настройки WebDriver для Chrome  
+    driver = webdriver.Chrome()
+    yield driver  
+    driver.quit()
 
-    def test_calculator_functionality(self):
-        calculator_page = CalculatorPage(self.driver)
-        
-        # Ввод задержки  
-        calculator_page.enter_delay("45")
-        
-        # Нажатие кнопок  
-        calculator_page.click_button_7()
-        calculator_page.click_button_plus()
-        calculator_page.click_button_8()
-        calculator_page.click_button_equals()
-        
-        # Ожидание результата  
-        WebDriverWait(self.driver, 60).until(
-            EC.text_to_be_present_in_element(calculator_page.result_display, "15")
-        )
-        
-        # Проверка результата  
-        result = calculator_page.get_result()
-        print("Результат:", result)
-        self.assertEqual(result, "15")
+def test_calculator(driver):
+    # Открываем страницу калькулятора  
+    driver.get("https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html")
+    
+    calculator_page = CalculatorPage(driver)
 
-    def tearDown(self):
-        self.driver.quit()
-
-if __name__ == "__main__":
-    unittest.main()
+    # Ввод значения задержки  
+    calculator_page.set_delay("45")
+    
+    # Выполнение вычисления  
+    calculator_page.click_button7()
+    calculator_page.click_button_plus()
+    calculator_page.click_button8()
+    calculator_page.click_button_equals()
+    
+    # Проверка результата  
+    result = calculator_page.get_result()
+    
+    # Ожидаем, что результат будет 15  
+    assert result == "15"

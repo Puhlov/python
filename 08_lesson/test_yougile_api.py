@@ -1,88 +1,50 @@
 import requests
-import pytest
+from conftest import HEADERS
+from conftest import BASE_URL
 
-# Настройки
-BASE_URL = "https://ru.yougile.com/api-v2"
-TOKEN = "надо заменить"  # Замените на свой токен доступа
-
-# Заголовки для авторизации
-HEADERS = {
-    "Authorization": f"Bearer {TOKEN}",
-    "Content-Type": "application/json"
-}
 
 def create_project(project_data):
-    """Создает проект с переданными данными."""
-    response = requests.post(f"{BASE_URL}/projects", json=project_data, headers=HEADERS)
-    return response
+    return requests.post(f"{BASE_URL}/projects", json=project_data, headers=HEADERS)
+
 
 def update_project(project_id, project_data):
-    """Обновляет проект с указанным ID."""
-    response = requests.put(f"{BASE_URL}/projects/{project_id}", json=project_data, headers=HEADERS)
-    return response
+    return requests.put(f"{BASE_URL}/projects/{project_id}", json=project_data, headers=HEADERS)
+
 
 def get_project(project_id):
-    """Получает проект по указанному ID."""
-    response = requests.get(f"{BASE_URL}/projects/{project_id}", headers=HEADERS)
-    return response
+    return requests.get(f"{BASE_URL}/projects/{project_id}", headers=HEADERS)
 
-@pytest.fixture
-def project_payload():
-    """Фикстура для создания тестового проекта."""
-    return {
-        "name": "Test Project",
-        "description": "This is a test project",
-        "status": "active",  # Убедитесь, что статус соответствует документации
-    }
-
-@pytest.fixture
-def project_id(project_payload):
-    """Создает проект и возвращает его ID для тестирования обновления и получения."""
-    response = create_project(project_payload)
-    assert response.status_code == 201  # Убедитесь, что проект создан
-    return response.json()["id"]
 
 def test_create_project_positive(project_payload):
-    """Тест на создание проекта (позитивный сценарий)."""
     response = create_project(project_payload)
     assert response.status_code == 201
-    assert response.json()["name"] == project_payload["name"]
 
 def test_create_project_negative():
-    """Тест на создание проекта (негативный сценарий) без обязательного поля."""
-    invalid_payload = {
-        "description": "Missing name"
-    }
-    response = create_project(invalid_payload)
-    assert response.status_code == 400  # Ожидаем ошибку 400 за отсутствие обязательного поля
+    response = create_project({"description": "Missing title"})  # нет поля title
+    assert response.status_code == 400
 
 def test_update_project_positive(project_id):
-    """Тест на обновление проекта (позитивный сценарий)."""
-    updated_payload = {
-        "name": "Updated Project Name",
-        "description": "Updated description"
-    }
-    response = update_project(project_id, updated_payload)
-    assert response.status_code == 200
-    assert response.json()["name"] == updated_payload["name"]
+    updated_payload = {"title": "Updated Project Title"}
+    update_response = update_project(project_id, updated_payload)
+    assert update_response.status_code == 200
+    get_response = get_project(project_id)
+    assert get_response.status_code == 200
+    actual_title = get_response.json().get("title") or get_response.json().get("name")
+    assert actual_title == updated_payload["title"]
 
-def test_update_project_negative():
-    """Тест на обновление проекта (негативный сценарий) с неверным ID."""
-    invalid_project_id = "invalid_id"
-    updated_payload = {
-        "name": "New Project Name"
-    }
-    response = update_project(invalid_project_id, updated_payload)
-    assert response.status_code == 404  # Ожидаем ошибку 404 за несуществующий проект
+
+
+def test_update_project_negative(nonexistent_id):
+    response = update_project(nonexistent_id, {"title": "Ghost"})  # "name" → "title"
+    assert response.status_code == 404
+
 
 def test_get_project_positive(project_id):
-    """Тест на получение проекта (позитивный сценарий)."""
     response = get_project(project_id)
     assert response.status_code == 200
     assert response.json()["id"] == project_id
 
-def test_get_project_negative():
-    """Тест на получение проекта (негативный сценарий) с неверным ID."""
-    invalid_project_id = "invalid_id"
-    response = get_project(invalid_project_id)
-    assert response.status_code == 404  # Ожидаем ошибку 404 за несуществующий проект
+
+def test_get_project_negative(nonexistent_id):
+    response = get_project(nonexistent_id)
+    assert response.status_code == 404

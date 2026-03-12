@@ -4,12 +4,12 @@ from models import Student, engine
 
 @pytest.fixture(scope='module')
 def db_session():
-    """Создает сессию для тестов и удаляет данные после тестов."""
     connection = engine.connect()
     transaction = connection.begin()
     session = sessionmaker(bind=connection)()
+    session.begin_nested()  # создаём savepoint
 
-    yield session  # Тесты могут использовать эту сессию
+    yield session
 
     session.close()
     transaction.rollback()
